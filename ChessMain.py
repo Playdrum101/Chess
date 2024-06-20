@@ -25,11 +25,11 @@ def main():
     moveMade = False
     loadImages()
     running = True
-    sqSelected = ()
-    playerClicks = []
+    sqSelected = ()             #Ensuring it is empty
+    playerClicks = []           #Ensuring it is empty
     while running:
         for e in p.event.get():
-            if e.type == p.QUIT:
+            if e.type == p.QUIT:                    #If user clicks cross button
                 running = False
             elif e.type == p.MOUSEBUTTONDOWN:
                 location = p.mouse.get_pos()
@@ -47,6 +47,7 @@ def main():
                     if move in validMoves:
                         gs.makeMove(move)
                         moveMade = True
+                        print("here")
                     sqSelected = ()
                     playerClicks = []
             elif e.type == p.KEYDOWN:

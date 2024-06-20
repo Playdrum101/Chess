@@ -35,24 +35,29 @@ class GameState():
     def getAllPossibleMoves(self):
          moves = []
          for r in range(len(self.board)):
-              for c in range(len(self.board[r])):
+              for c in range(len(self.board)):
                    turn = self.board[r][c][0]
                    if(turn == 'w' and self.whitetoMove) or (turn == 'b' and not self.whitetoMove):
                         piece = self.board[r][c][1]
-                        if piece == "p":
-                            print("here")
-                            return self.getPawnMoves(r,c,moves)
-                        elif piece == "r":
+                        if piece == "P":
+                             return self.getPawnmoves(r,c,moves)
+                        elif piece == "R":
                              return self.getRookMoves(r,c,moves)
          return moves 
 
     def getPawnmoves(self,r,c,moves):
-         if self.whitetoMove:
+        if self.whitetoMove:
               if self.board[r-1][c] == "--":
                    moves.append(Move((r,c),(r-1,c),self.board))
                    if r==6 and self.board[r-2][c] == "--":
-                       moves.append(Move((r,c),(r-2,c),self.board)) 
-
+                       moves.append(Move((r,c),(r-2,c),self.board))
+        
+                       
+        if not self.whitetoMove:
+            if self.board[r+1][c] == "--":
+                   moves.append(Move((r,c),(r+1,c),self.board))
+                   if r==1 and self.board[r+2][c] == "--":
+                       moves.append(Move((r,c),(r+2,c),self.board))
 
     def getRookmoves(self,r,c,moves):
          pass
@@ -69,9 +74,7 @@ class Move():
                     "e": 4, "f": 5, "g": 6, "h": 7}
 
     colstoFiles = { v:k for k,v in filestoCols.items()}
-
-        
-
+      
     def __init__(self, startSq, endSq, board):
         self.startRow = startSq[0]
         self.startCol  =startSq[1]
@@ -81,6 +84,7 @@ class Move():
         self.pieceCaptured = board[self.endRow][self.endCol]
         self.moveID = self.startRow * 1000 + self.startCol * 100 + self.endRow * 10 + self.endCol
         print(self.moveID)
+
 
     def __eq__(self,other):
          if isinstance(other,Move):
