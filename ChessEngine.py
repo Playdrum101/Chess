@@ -20,6 +20,8 @@ class GameState():
         self.checkMate = False
         self.staleMate = False
         self.enpassantPossible = ()
+        self.currentCastlingRights = CastleRights(True,True,True,True)
+        self.castleRightsLog = [self.currentCastlingRights]
 
 
     def undoMove(self):
@@ -55,14 +57,22 @@ class GameState():
 
           if move.isEnpassantMove:
               self.board[move.startRow][move.endCol] = "--"
-          if move.pieceMoved[1]=='P':
+
+          if move.pieceMoved[1]=='P' and abs(move.startRow - move.endRow) == 2:
               self.enpassantPossible = ((move.startRow+move.endRow)//2,move.startCol)
           else:
               self.enpassantPossible = ()
              
 
 
-            
+
+    def updateCastlingRights(self,move):
+         if move.pieceMoved == "wK":
+            self.currentCastlingRights.wks = False
+            self.currentCastlingRights.wqs = False
+         elif move.pieceMoved == "bK":
+              self.currentCastlingRights.bks = False
+              self.currentCastlingRights.bqs = False
 
     def getValidMoves(self):
          tempEnpassantPossible = self.enpassantPossible
@@ -115,31 +125,46 @@ class GameState():
 
     def getPawnMoves(self,r,c,moves):
            if self.whitetoMove:
-               if self.board[r - 1][c] == "--":  # Standard move forward
+                # Standard move forward
+               if self.board[r - 1][c] == "--": 
                     moves.append(Move((r, c), (r - 1, c), self.board))
-               if r == 6 and self.board[r - 2][c] == "--":  # Double move for starting pawn
+               # Double move for starting pawn
+               if r == 6 and self.board[r - 2][c] == "--": 
                     moves.append(Move((r, c), (r - 2, c), self.board))
-               # Check diagonally for captures (fix for standard capture bug)
+               # Check diagonally for captures
                if c - 1 >= 0 and self.board[r - 1][c - 1][0] == "b":
                     moves.append(Move((r, c), (r - 1, c - 1), self.board))
+               #Check for enPassant
                if c - 1 >= 0 and (r-1,c-1) == self.enpassantPossible: 
                          moves.append(Move((r, c), (r - 1, c - 1), self.board,enpassantMove=True))
+
+                # Check diagonally for captures
                if c + 1 <= 7 and self.board[r - 1][c + 1][0] == "b":
                     moves.append(Move((r, c), (r - 1, c + 1), self.board))
+                #Check for enPassant
                if c + 1 <= 7 and (r-1,c+1) == self.enpassantPossible:
                     moves.append(Move((r, c), (r - 1, c + 1), self.board, enpassantMove=True))
            else:
-               if self.board[r + 1][c] == "--":  # Standard move forward
+               # Standard move forward
+               if self.board[r + 1][c] == "--":  
                     moves.append(Move((r, c), (r + 1, c), self.board))
-               if r == 1 and self.board[r + 2][c] == "--":  # Double move for starting pawn
+                # Double move for starting pawn
+               if r == 1 and self.board[r + 2][c] == "--":  
                     moves.append(Move((r, c), (r + 2, c), self.board))
-               # Check diagonally for captures (fix for standard capture bug)
+
+                    
+               # Check diagonally for captures
                if c - 1 >= 0 and self.board[r + 1][c - 1][0] == "w":
                     moves.append(Move((r, c), (r + 1, c - 1), self.board))
+                #Check for enPassant
                if c - 1 >= 0 and (r+1,c-1) == self.enpassantPossible: 
                          moves.append(Move((r, c), (r + 1, c - 1), self.board,enpassantMove=True))
+
+
+                # Check diagonally for captures
                if c + 1 <= 7 and self.board[r + 1][c + 1][0] == "w":
                     moves.append(Move((r, c), (r + 1, c + 1), self.board))
+                #Check for enPassant
                if c + 1 <= 7 and (r+1,c+1) == self.enpassantPossible:
                     moves.append(Move((r, c), (r + 1, c + 1), self.board, enpassantMove=True))
              
@@ -223,7 +248,17 @@ class GameState():
                 endPiece = self.board[endRow][endCol]
                 if endPiece[0] != allyColor:
                     moves.append(Move((r,c),(endRow,endCol),self.board))
-    
+
+class CastleRights():
+    def __init__(self,wks,bks,wqs,bqs):
+        self.wks = wks
+        self.bks = bks
+        self.wqs = wqs
+        self.bqs = bqs
+
+        
+
+        
 
 class Move():
 
@@ -251,9 +286,10 @@ class Move():
         self.isEnpassantMove = enpassantMove
         if self.isEnpassantMove:
              if self.pieceMoved == "bP":
-                    self.pieceCaptured = "wP"    
+                    self.pieceCaptured = "wP" 
              else:
                     self.pieceCaptured = "bP"
+
 
 
     def __eq__(self,other):
