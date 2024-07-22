@@ -86,10 +86,7 @@ class GameState():
                 
                self.castleRightsLog.pop()               
                self.currentCastlingRights = self.castleRightsLog[:-1]
-               self.castleRightsLog = CastleRights(self.currentCastlingRights.wks,self.currentCastlingRights.bks,
-                                                   self.currentCastlingRights.wqs,self.currentCastlingRights.bqs)
-
-
+               
 
                if move.isCastleMove:
                     if move.endCol - move.endRow == 2:
@@ -151,10 +148,7 @@ class GameState():
          else:
             self.checkMate = False
             self.staleMate = False
-         if self.whitetoMove:
-              self.getCastleMoves(self.whiteKingLocation[0], self.whiteKingLocation[1], moves)
-         else:
-              self.getCastleMoves(self.blackKingLocation[0], self.blackKingLocation[1], moves)
+         
     
          self.enpassantPossible = tempEnpassantPossible 
          self.currentCastlingRights = tempCastlingRights 
@@ -313,10 +307,12 @@ class GameState():
                 endPiece = self.board[endRow][endCol]
                 if endPiece[0] != allyColor:
                     moves.append(Move((r,c),(endRow,endCol),self.board))
+
+            
             
         
     def getCastleMoves(self,r,c,moves):
-         if self.incheck():
+         if self.sqUnderAttack(r,c):
               return
          if (self.whitetoMove and self.currentCastlingRights.wks) or (not self.whitetoMove and self.currentCastlingRights.bks):
               self.getKingsideCastleMoves(r,c,moves)
