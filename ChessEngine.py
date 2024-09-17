@@ -1,6 +1,7 @@
 """" Checks Valid Moves"""
 
-class GameState():
+"""class represents the current state of the chessboard. It includes the board itself (a list of lists representing pieces)"""
+class GameState():    
     def __init__(self):
         self.board = [
             ["bR","bN","bB","bQ","bK","bB","bN","bR"],
@@ -25,9 +26,9 @@ class GameState():
                                              self.currentCastlingRight.wqs, self.currentCastlingRight.bqs)]
         
 
-             
+         
 
-    def makeMove(self,move):
+    def makeMove(self,move):       
           self.board[move.startRow][move.startCol] = "--"
           self.board[move.endRow][move.endCol] = move.pieceMoved
           self.moveLog.append(move)
@@ -114,6 +115,9 @@ class GameState():
                          self.currentCastlingRight.bks = False
 
     def getValidMoves(self):
+         for log in self.castleRightsLog:
+              print(log.wks,log.wqs,log.bks,log.bqs, end=", ")
+         print("HEREEEEEEEEEEEEEEEE")
          tempEnpassantPossible = self.enpassantPossible
          tempCastleRights = CastleRights(self.currentCastlingRight.wks, self.currentCastlingRight.bks,
                                              self.currentCastlingRight.wqs, self.currentCastlingRight.bqs)
@@ -133,6 +137,7 @@ class GameState():
          if len(moves) == 0:
             if self.inCheck():
                 self.checkMate = True
+                print(self.checkMate)
             else:
                 self.staleMate = True
          else:
@@ -316,7 +321,7 @@ class GameState():
               if not self.sqUnderAttack(r,c-1) and not self.sqUnderAttack(r,c-2):
                    moves.append(Move((r,c),(r,c-2),self.board,isCastleMove=True))
 
-
+"""tracks the castling rights"""
 class CastleRights():
     def __init__(self,wks,bks,wqs,bqs):
         self.wks = wks
@@ -326,7 +331,7 @@ class CastleRights():
 
 
         
-
+"""represents a single move"""
 class Move():
 
     rankstoRows = { "1": 7, "2": 6, "3": 5, "4": 4,
@@ -348,7 +353,6 @@ class Move():
         self.pieceCaptured = board[self.endRow][self.endCol]
         self.moveID = self.startRow * 1000 + self.startCol * 100 + self.endRow * 10 + self.endCol
         self.isPawnPromotion = ((self.pieceMoved == "wP" and self.endRow == 0) or (self.pieceMoved == "bP" and self.endRow == 7))
-        print(self.moveID)
 
         self.isEnpassantMove = isEnpassantMove
         if self.isEnpassantMove:
